@@ -1,0 +1,126 @@
+<!-- templates/theory.html -->
+{% extends "base.html" %}
+{% block content %}
+
+<div style="margin-bottom: 24px;">
+    <h1 style="font-size: 20px; font-weight: 700; color: var(--text-main); margin-bottom: 4px;">
+        Cơ Sở Lý Thuyết Khảo Sát Giấu Tin & Mô Hình Blockchain
+    </h1>
+    <p style="font-size: 13.5px; color: var(--text-muted);">
+        Tài liệu tóm tắt học thuật phục vụ báo cáo đồ án, thuyết minh đề tài nghiên cứu cho giảng viên.
+    </p>
+</div>
+
+<div class="grid-2">
+    <!-- Cột trái: Lý thuyết Giấu tin -->
+    <div>
+        <div class="card" style="margin-bottom: 24px;">
+            <div class="card-header">
+                <div class="card-title">
+                    <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/><line x1="16" y1="13" x2="8" y2="13"/><line x1="16" y1="17" x2="8" y2="17"/><polyline points="10 9 9 9 8 9"/></svg>
+                    1. Giấu Tin Trong Ảnh (Image Steganography)
+                </div>
+            </div>
+            <p style="font-size: 13.5px; line-height: 1.6; color: var(--text-sub);">
+                <strong>Giấu tin (Steganography)</strong> là kỹ thuật ẩn giấu thông tin bí mật vào một đối tượng mang (Cover Image) sao cho bên thứ ba không thể nhận biết sự hiện diện của thông tin đó.
+            </p>
+            <p style="font-size: 13.5px; line-height: 1.6; color: var(--text-sub); margin-top: 10px;">
+                Khác với <em>Mật mã học (Cryptography)</em> – vốn xáo trộn bản rõ thành dạng không đọc được dễ gây nghi ngờ, Giấu tin hướng đến tính <strong>tàng hình thị giác (Imperceptibility)</strong> để bảo vệ bản quyền chữ ký số, hợp đồng điện tử và tài liệu pháp lý.
+            </p>
+        </div>
+
+        <div class="card" style="margin-bottom: 24px;">
+            <div class="card-header">
+                <div class="card-title">
+                    <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1 0 2.83 2 2 0 0 1-2.83 0l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-2 2 2 2 0 0 1-2-2v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83 0 2 2 0 0 1 0-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1-2-2 2 2 0 0 1 2-2h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 0-2.83 2 2 0 0 1 2.83 0l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 2-2 2 2 0 0 1 2 2v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 0 2 2 0 0 1 0 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 2 2 2 2 0 0 1-2 2h-.09a1.65 1.65 0 0 0-1.51 1z"/></svg>
+                    2. Nguyên Lý Thuật Toán LSB (Least Significant Bit)
+                </div>
+            </div>
+            <p style="font-size: 13.5px; line-height: 1.6; color: var(--text-sub);">
+                Mỗi pixel được biểu diễn bởi các kênh màu RGB (Red, Green, Blue), mỗi kênh chiếm 8 bits (giá trị 0 - 255).
+            </p>
+            <div style="background-color: #f1f5f9; padding: 12px 14px; border-radius: var(--radius-md); margin: 12px 0; font-family: monospace; font-size: 13px; border: 1px solid var(--border-color);">
+                Byte gốc: 1101011<strong style="color: var(--danger);">0</strong> (214)<br>
+                Bit cần giấu: <strong style="color: var(--primary);">1</strong><br>
+                Byte sau giấu: 1101011<strong style="color: var(--primary);">1</strong> (215) &rarr; Độ lệch màu chỉ là 1/255 &approx; 0.39%
+            </div>
+            <p style="font-size: 13.5px; line-height: 1.6; color: var(--text-sub);">
+                Theo mô hình Hệ thống thị giác con người (HVS), sự thay đổi 1 đơn vị mức xám hoàn toàn không thể phát hiện bằng mắt thường.
+            </p>
+            <ul style="margin-left: 20px; margin-top: 8px; font-size: 13px; line-height: 1.6; color: var(--text-sub);">
+                <li><strong>Kênh G (Green):</strong> Mắt người nhạy cảm với cường độ sáng tổng thể của màu xanh lá, biến đổi LSB trên G tạo ít nhiễu cục bộ nhất.</li>
+                <li><strong>1-LSB vs 2-LSB:</strong> 1-LSB cho PSNR &gt; 70 dB. 2-LSB tăng gấp đôi sức chứa nhưng giảm PSNR xuống khoảng 50 dB.</li>
+            </ul>
+        </div>
+    </div>
+
+    <!-- Cột phải: Chỉ số & Blockchain -->
+    <div>
+        <div class="card" style="margin-bottom: 24px;">
+            <div class="card-header">
+                <div class="card-title">
+                    <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="18" y1="20" x2="18" y2="10"/><line x1="12" y1="20" x2="12" y2="4"/><line x1="6" y1="20" x2="6" y2="14"/></svg>
+                    3. Các Chỉ Số Đánh Giá Chất Lượng Khoa Học
+                </div>
+            </div>
+
+            <div style="font-size: 13.5px; font-weight: 600; color: var(--text-main); margin-bottom: 4px;">a) MSE (Mean Squared Error)</div>
+            <p style="font-size: 13px; color: var(--text-muted); margin-bottom: 6px;">Sai số bình phương trung bình giữa ảnh gốc $I$ và ảnh sau giấu tin $I'$:</p>
+            <div style="background-color: #f8fafc; padding: 8px 12px; border-radius: 4px; font-family: monospace; font-size: 12.5px; margin-bottom: 12px; border: 1px solid var(--border-color);">
+                MSE = (1 / (3 &times; M &times; N)) &times; &sum; [I(x,y,c) - I'(x,y,c)]&sup2;
+            </div>
+
+            <div style="font-size: 13.5px; font-weight: 600; color: var(--text-main); margin-bottom: 4px;">b) PSNR (Peak Signal-to-Noise Ratio)</div>
+            <p style="font-size: 13px; color: var(--text-muted); margin-bottom: 6px;">Tỉ số tín hiệu cực đại trên nhiễu (dB):</p>
+            <div style="background-color: #f8fafc; padding: 8px 12px; border-radius: 4px; font-family: monospace; font-size: 12.5px; margin-bottom: 6px; border: 1px solid var(--border-color);">
+                PSNR = 10 &times; log10 ( 255&sup2; / MSE ) (dB)
+            </div>
+            <div style="font-size: 12.5px; color: var(--text-sub); margin-bottom: 12px;">
+                &bull; PSNR &gt; 40 dB: Mắt thường không thể phát hiện sai khác.<br>
+                &bull; PSNR &gt; 60 dB: Chất lượng xuất sắc đặc trưng của thuật toán 1-LSB.
+            </div>
+
+            <div style="font-size: 13.5px; font-weight: 600; color: var(--text-main); margin-bottom: 4px;">c) SSIM (Structural Similarity Index)</div>
+            <p style="font-size: 13px; color: var(--text-sub); margin-bottom: 12px;">
+                Đo độ tương đồng cấu trúc theo 3 yếu tố: Độ chói (Luminance), Độ tương phản (Contrast) và Cấu trúc hình học (Structure). Giá trị từ 0 đến 1.
+            </p>
+
+            <div style="font-size: 13.5px; font-weight: 600; color: var(--text-main); margin-bottom: 4px;">d) BER (Bit Error Rate)</div>
+            <p style="font-size: 13px; color: var(--text-muted); margin-bottom: 6px;">Tỉ lệ phần trăm bit bị sai lệch sau khi bị tấn công / nén ảnh:</p>
+            <div style="background-color: #f8fafc; padding: 8px 12px; border-radius: 4px; font-family: monospace; font-size: 12.5px; border: 1px solid var(--border-color);">
+                BER = (Số bit trích sai / Tổng số bit gốc) &times; 100%
+            </div>
+        </div>
+
+        <div class="card" style="margin-bottom: 24px;">
+            <div class="card-header">
+                <div class="card-title">
+                    <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><ellipse cx="12" cy="5" rx="9" ry="3"/><path d="M21 12c0 1.66-4 3-9 3s-9-1.34-9-3"/><path d="M3 5v14c0 1.66 4 3 9 3s9-1.34 9-3V5"/></svg>
+                    4. Mô Hình Kết Hợp Blockchain Chống Giả Mạo
+                </div>
+            </div>
+            <p style="font-size: 13.5px; line-height: 1.6; color: var(--text-sub);">
+                <strong>Hạn chế của LSB:</strong> Thuật toán miền không gian LSB rất nhạy cảm với nén mất mát (JPEG compression) hoặc chỉnh sửa điểm ảnh.
+            </p>
+            <p style="font-size: 13.5px; line-height: 1.6; color: var(--text-sub); margin-top: 8px;">
+                <strong>Giải pháp kết hợp Blockchain:</strong> Lưu trữ mã băm SHA-256 bất biến của ảnh và watermark:
+            </p>
+            <ul style="margin-left: 20px; font-size: 13px; line-height: 1.6; color: var(--text-sub); margin-top: 6px;">
+                <li><strong>Bất biến (Immutability):</strong> Bản ghi không thể bị sửa chữa hoặc xóa bỏ sau khi tạo.</li>
+                <li><strong>Chống chối bỏ (Non-repudiation):</strong> Lưu vết chính xác tác giả, email, mốc thời gian UTC và mã giao dịch.</li>
+                <li><strong>Phát hiện can thiệp tức thì (Instant Tamper Detection):</strong> Bất kỳ ai chỉnh sửa dù chỉ 1 pixel cũng làm mã SHA-256 thay đổi hoàn toàn, ngăn chặn tuyệt đối hành vi giả mạo chữ ký.</li>
+            </ul>
+        </div>
+    </div>
+</div>
+
+<div style="display: flex; gap: 10px;">
+    <a href="{{ url_for('index') }}" class="btn btn-secondary">
+        Quay lại trang chủ
+    </a>
+    <a href="{{ url_for('benchmark') }}" class="btn btn-primary">
+        Thực nghiệm Khảo sát Tấn công &rarr;
+    </a>
+</div>
+
+{% endblock %}

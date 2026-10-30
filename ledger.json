@@ -1,0 +1,259 @@
+{
+  "9446a52dbdc48f3948ec0c9bef7d7e5a29bbaff0ef7ddc764838f5af458ff4ba": {
+    "image_hash": "9446a52dbdc48f3948ec0c9bef7d7e5a29bbaff0ef7ddc764838f5af458ff4ba",
+    "watermark_hash": "97073d52632d8d521982f6ff0dd2203ed6b904fbe75b3ae428bf092d5f47a4ff",
+    "author": {
+      "name": "hoàng minh hiếu",
+      "email": "hoanghieumi1@gmail.com",
+      "link": ""
+    },
+    "bits_length": 24,
+    "timestamp": "2025-12-08T10:16:45.593316Z",
+    "tx_hash": "037cca64cad3fdbadcf3b2b787c5927d047880f423caf57f86c5daebc675f145",
+    "stego_params": {
+      "channel": "G",
+      "bit_depth": 1,
+      "psnr": 70.0,
+      "ssim": 0.9999
+    }
+  },
+  "4161cd611f53409721e28fd64da9dd37aa6fbeddc4efe27077f8f9474d4ce1da": {
+    "image_hash": "4161cd611f53409721e28fd64da9dd37aa6fbeddc4efe27077f8f9474d4ce1da",
+    "watermark_hash": "55fcf7d45b9b8cc2e5fa0d6b41a3e6c25f8c59ea65e8771211fc210a78a8cc96",
+    "author": {
+      "name": "hoàng minh hiếu",
+      "email": "hoanghieumi1@gmail.com",
+      "link": "hieuinfo.vn"
+    },
+    "bits_length": 152,
+    "timestamp": "2025-12-08T10:23:36.482853Z",
+    "tx_hash": "0d45941686f8c3ecc0816fc50c24809ff74f229e2b2190398a5872cae5b97b44",
+    "stego_params": {
+      "channel": "G",
+      "bit_depth": 1,
+      "psnr": 70.0,
+      "ssim": 0.9999
+    }
+  },
+  "b78c4b9d17021c9c0773a0e8a7da442f7ccce302a3d3d0d5240bee73f2a3b780": {
+    "image_hash": "b78c4b9d17021c9c0773a0e8a7da442f7ccce302a3d3d0d5240bee73f2a3b780",
+    "watermark_hash": "afc8e16842061ea3dbb023bf5f08d1bc3a728429313fab0cba30f60954ff9064",
+    "author": {
+      "name": "hoàng minh hiếu",
+      "email": "hoanghieuldb@gmail.com",
+      "link": "hieuinfo.vn"
+    },
+    "bits_length": 32,
+    "timestamp": "2026-03-02T11:51:34.657412Z",
+    "tx_hash": "ed28e705449a6d7bb79943e52cc43843929e5d858f4966968927e0c677639daf",
+    "stego_params": {
+      "channel": "G",
+      "bit_depth": 1,
+      "psnr": 70.0,
+      "ssim": 0.9999
+    }
+  },
+  "83987426bb4e3182d9e5bb0b97172da691076a4d00492c30d391811b258d29d1": {
+    "image_hash": "83987426bb4e3182d9e5bb0b97172da691076a4d00492c30d391811b258d29d1",
+    "watermark_hash": "86abab403fc68f706b3c4e5145c3fd9ccedb2512d010dd8d2b3224071b65fc16",
+    "author": {
+      "name": "hoàng minh hiếu",
+      "email": "23A1001D0139@students.hou.edu.vn",
+      "link": "hieuinfo.vn"
+    },
+    "bits_length": 80,
+    "timestamp": "2026-03-02T11:53:15.147265Z",
+    "tx_hash": "5207a3238e3a011a43d36817c3ce2f11416ec28cbd0f05daac6de2c724b92bcd",
+    "stego_params": {
+      "channel": "G",
+      "bit_depth": 1,
+      "psnr": 70.0,
+      "ssim": 0.9999
+    }
+  },
+  "e550389611a39c0c8b6fda9842f2d716643b9f085e8c070d7ad2bce986e9d014": {
+    "image_hash": "e550389611a39c0c8b6fda9842f2d716643b9f085e8c070d7ad2bce986e9d014",
+    "watermark_hash": "b82f63c013a6444e2a94c287100bed10f3ea416d134d76cf59759ae1303e1848",
+    "author": {
+      "name": "hoàng minh hiếu",
+      "email": "hoanghieuldb@gmail.com",
+      "link": "hieuinfo.vn"
+    },
+    "bits_length": 80,
+    "timestamp": "2026-03-02T12:02:09.063574Z",
+    "tx_hash": "48dd5a88feb80123f45d3598ac69b59731a629e9fdaf3ebd8551b31df97ac9cb",
+    "stego_params": {
+      "channel": "G",
+      "bit_depth": 1,
+      "psnr": 70.0,
+      "ssim": 0.9999
+    }
+  },
+  "26fade1915369a7b8dfeae69d68ff5cbe8a0f90c3216f96187782c64aaeef38e": {
+    "image_hash": "26fade1915369a7b8dfeae69d68ff5cbe8a0f90c3216f96187782c64aaeef38e",
+    "watermark_hash": "4c53240ecd26c1659864d420b6eb803f7a18970fe69048166bfdfbef96db5ff8",
+    "author": {
+      "name": "hoàng minh hiếu",
+      "email": "23A1001D0139@students.hou.edu.vn",
+      "link": "hieuinfo.vn"
+    },
+    "bits_length": 112,
+    "timestamp": "2026-03-30T04:45:28.991657Z",
+    "tx_hash": "9ec120b280c2d7d1200082c2870e831e587f12d5ec6379c0b278cc070261c68e",
+    "stego_params": {
+      "channel": "G",
+      "bit_depth": 1,
+      "psnr": 70.0,
+      "ssim": 0.9999
+    }
+  },
+  "8676fcf9f55e0a572db2b35febf4c67331a0e44bba00a6bd445688bf57e2abad": {
+    "image_hash": "8676fcf9f55e0a572db2b35febf4c67331a0e44bba00a6bd445688bf57e2abad",
+    "watermark_hash": "de7bd0e35e40062f3d6165ec7c75e16807b7fe77deac4a5a66bb31d4f16d1fcc",
+    "author": {
+      "name": "hoàng minh hiếu",
+      "email": "23A1001D0139@students.hou.edu.vn",
+      "link": "hieuinfo.vn"
+    },
+    "bits_length": 72,
+    "timestamp": "2026-04-01T07:32:41.683731Z",
+    "tx_hash": "053cd54ca55f77c2a8ca5eda396a97f40c43c406ccb9d134bb5bd1f894d8b435",
+    "stego_params": {
+      "channel": "G",
+      "bit_depth": 1,
+      "psnr": 70.0,
+      "ssim": 0.9999
+    }
+  },
+  "e6d9873f4ff35ad89d0d06159333f7b3648286b0189296594550e12ab05dfd92": {
+    "image_hash": "e6d9873f4ff35ad89d0d06159333f7b3648286b0189296594550e12ab05dfd92",
+    "watermark_hash": "a869b48615db21642541d3a9efb9c7cd20d6e343e4418f041d296194e4a7a917",
+    "author": {
+      "name": "Nguyễn Văn Test",
+      "email": "test@example.com",
+      "link": "https://example.com"
+    },
+    "bits_length": 368,
+    "timestamp": "2026-10-30T11:26:55.890582Z",
+    "tx_hash": "f0a87e62ef11dcdc8744dbfcb3404cbad0ce1aaec66e10993274b66d67395997",
+    "stego_params": {
+      "channel": "G",
+      "bit_depth": 1,
+      "psnr": 70.0,
+      "ssim": 0.9999
+    }
+  },
+  "506ee8225d01550d0047481667db6216af87c6a3374b50772dcf1b8fd6562434": {
+    "image_hash": "506ee8225d01550d0047481667db6216af87c6a3374b50772dcf1b8fd6562434",
+    "watermark_hash": "f705cd36325ffc0c99af0c56673b1f718c227d990a3d379e87c9adaa1eb0878f",
+    "author": {
+      "name": "test",
+      "email": "kaz442197@gmail.com",
+      "link": "https://chat.zalo.me/"
+    },
+    "bits_length": 48,
+    "timestamp": "2026-10-30T11:29:42.634645Z",
+    "tx_hash": "36ff214c0288d80a2ce780f3c09482f14a47fdbb04791279996d366610c67861",
+    "stego_params": {
+      "channel": "G",
+      "bit_depth": 1,
+      "psnr": 70.0,
+      "ssim": 0.9999
+    }
+  },
+  "29262ade647e6b6aee94e274e7683616aca8a9f1fd7f4ff71637c1dfe6844f8f": {
+    "tx_hash": "476a3a9cb84592d7b78e2c5d56abccdd0049d88303c39c87df5c209c2713a5fa",
+    "image_hash": "29262ade647e6b6aee94e274e7683616aca8a9f1fd7f4ff71637c1dfe6844f8f",
+    "watermark_hash": "0942fea1baa823781f5947dfebc047a13b9e77456ac839507990960800b2fdb6",
+    "author": {
+      "name": "TS. Nguyễn Khảo Sát",
+      "email": "lab@university.edu.vn",
+      "link": ""
+    },
+    "bits_length": 344,
+    "stego_params": {
+      "channel": "G",
+      "bit_depth": 1,
+      "psnr": 72.55,
+      "ssim": 0.999985,
+      "mse": 0.003611
+    },
+    "timestamp": "2026-10-30T11:36:11.154276Z"
+  },
+  "d3309192b66745fb5cef7ce20c6e98b0040dfb983cdb5120802c54bbdf8b065d": {
+    "tx_hash": "c020f43f4b482f1100b58e4bf4b41ebda950d2ba1abbd9b57eb6105c9a6ca5db",
+    "image_hash": "d3309192b66745fb5cef7ce20c6e98b0040dfb983cdb5120802c54bbdf8b065d",
+    "watermark_hash": "3e8d75426e2a1a47c4a5922d68af4dccd1139c37ea6c58f8141f83f7007c40b9",
+    "author": {
+      "name": "Tester",
+      "email": "",
+      "link": ""
+    },
+    "bits_length": 224,
+    "stego_params": {
+      "channel": "G",
+      "bit_depth": 1,
+      "psnr": 72.99,
+      "ssim": 0.999988,
+      "mse": 0.003267
+    },
+    "timestamp": "2026-10-30T11:42:28.551653Z"
+  },
+  "d2bab0a2fdfa73ac6629d72823ee6f7401567918d96048123e49fa79c828ced3": {
+    "tx_hash": "a112126910a0c5464883243e223f1936f3beac65765aeeabe9c915075f0063a6",
+    "image_hash": "d2bab0a2fdfa73ac6629d72823ee6f7401567918d96048123e49fa79c828ced3",
+    "watermark_hash": "044460de7b1030a06ee241ab20a8c088bb2dcff8efeedf083290e9d902ed1f4d",
+    "author": {
+      "name": "test",
+      "email": "kaz442197@gmail.com",
+      "link": "https://chat.zalo.me/"
+    },
+    "bits_length": 120,
+    "stego_params": {
+      "channel": "G",
+      "bit_depth": 1,
+      "psnr": 90.25,
+      "ssim": 1.0,
+      "mse": 6.1e-05
+    },
+    "timestamp": "2026-10-30T11:44:46.961735Z"
+  },
+  "2f56cd86a90f523803d7ee630dbf0c7ce3c0dfd3292a88b2bc419d2cb6f058dc": {
+    "tx_hash": "b6c8792f9c9d9c374b763934750afde72d306b5c22f9bf4fa992149f80b80362",
+    "image_hash": "2f56cd86a90f523803d7ee630dbf0c7ce3c0dfd3292a88b2bc419d2cb6f058dc",
+    "watermark_hash": "0ee203435594e33f14e8d196dbd1728721eb65096f5e3fe294d7fe1d8c5b47d2",
+    "author": {
+      "name": "CEO",
+      "email": "",
+      "link": ""
+    },
+    "bits_length": 176,
+    "stego_params": {
+      "channel": "G",
+      "bit_depth": 1,
+      "psnr": 73.76,
+      "ssim": 0.999991,
+      "mse": 0.002733
+    },
+    "timestamp": "2026-10-30T11:47:56.419363Z"
+  },
+  "a8eed86a4ae17cd9bc12a6d0f7f6b75e7704470aa2fe3bb0f5d842811fd8344d": {
+    "tx_hash": "94f3a0d5f4f5d2bf6160599e613e79efedc806aae945356ef2ed952828910431",
+    "image_hash": "a8eed86a4ae17cd9bc12a6d0f7f6b75e7704470aa2fe3bb0f5d842811fd8344d",
+    "watermark_hash": "deb592272078d9f6d2b533cdce1f0cdd8c75d5f4e3bc2afabcd62cf123b97eab",
+    "author": {
+      "name": "Nguyễn Văn A",
+      "email": "giamdoc@congty.com",
+      "link": ""
+    },
+    "bits_length": 616,
+    "stego_params": {
+      "channel": "G",
+      "bit_depth": 1,
+      "psnr": 83.3,
+      "ssim": 0.999999,
+      "mse": 0.000304
+    },
+    "timestamp": "2026-10-30T11:57:14.265984Z"
+  }
+}

@@ -1,0 +1,121 @@
+<!-- templates/result_verify.html -->
+{% extends "base.html" %}
+{% block content %}
+
+<div style="margin-bottom: 24px;">
+    <h1 style="font-size: 20px; font-weight: 700; color: var(--text-main); margin-bottom: 4px;">
+        Kết Quả Xác Thực Ảnh & Đối Soát Blockchain
+    </h1>
+    <p style="font-size: 13.5px; color: var(--text-muted);">
+        Hệ thống đã tính toán mã băm SHA-256 của tệp và đối chiếu trực tiếp với Sổ cái bất biến.
+    </p>
+</div>
+
+<!-- Trạng thái xác thực -->
+<div class="card"
+    style="margin-bottom: 24px; border-left: 5px solid {% if status == 'VALID' %}var(--success){% elif status == 'TAMPERED' %}var(--warning){% else %}var(--danger){% endif %};">
+    <div
+        style="display: flex; align-items: center; justify-content: space-between; flex-wrap: wrap; gap: 12px; margin-bottom: 14px;">
+        <span
+            class="badge {% if status == 'VALID' %}badge-success{% elif status == 'TAMPERED' %}badge-warning{% else %}badge-danger{% endif %}"
+            style="font-size: 14px; padding: 6px 14px;">
+            {% if status == "VALID" %}
+            Trạng thái: HỢP LỆ (VALID)
+            {% elif status == "TAMPERED" %}
+            Trạng thái: ĐÃ BỊ CHỈNH SỬA (TAMPERED)
+            {% else %}
+            Trạng thái: KHÔNG TÌM THẤY (NOT FOUND)
+            {% endif %}
+        </span>
+        <span style="font-size: 12.5px; color: var(--text-muted);">
+            Phương pháp: SHA-256 Digest + Spatial LSB Extraction
+        </span>
+    </div>
+
+    <div
+        style="font-size: 14px; color: var(--text-main); background-color: #f8fafc; padding: 12px 16px; border-radius: var(--radius-md); margin-bottom: 18px; border: 1px solid var(--border-color);">
+        {{ message }}
+    </div>
+
+    <div style="margin-bottom: 12px;">
+        <div style="font-size: 12px; font-weight: 600; color: var(--text-muted); text-transform: uppercase;">Image Hash
+            (SHA-256 của ảnh vừa tải lên):</div>
+        <code>{{ image_hash }}</code>
+    </div>
+
+    {% if record %}
+    <div class="grid-2" style="margin-top: 18px;">
+        <!-- Cột trái: Watermark -->
+        <div>
+            <div style="font-size: 13.5px; font-weight: 700; color: var(--text-main); margin-bottom: 8px;">
+                Nội Dung Watermark Trích Xuất Từ Ảnh
+            </div>
+            <div
+                style="background-color: #f1f5f9; border: 1px solid var(--border-input); border-radius: var(--radius-md); padding: 12px 14px; font-size: 14px; font-weight: 600; color: var(--primary); word-break: break-all;">
+                {{ extracted_text or 'Không trích xuất được ký tự' }}
+            </div>
+
+            <div style="margin-top: 14px;">
+                <div style="font-size: 12px; color: var(--text-muted); margin-bottom: 3px;">Watermark Hash (Trích xuất
+                    từ LSB):</div>
+                <code>{{ extracted_hash or 'N/A' }}</code>
+            </div>
+            <div style="margin-top: 8px;">
+                <div style="font-size: 12px; color: var(--text-muted); margin-bottom: 3px;">Watermark Hash (Lưu trên
+                    Blockchain):</div>
+                <code>{{ record.watermark_hash }}</code>
+            </div>
+        </div>
+
+        <!-- Cột phải: Tác giả -->
+        <div>
+            <div style="font-size: 13.5px; font-weight: 700; color: var(--text-main); margin-bottom: 8px;">
+                Thông Tin Bản Quyền Gốc Trên Blockchain
+            </div>
+            <table>
+                <tr>
+                    <td style="color: var(--text-muted); width: 35%;">Tác giả:</td>
+                    <td><strong>{{ record.author.name or 'Chưa rõ' }}</strong></td>
+                </tr>
+                <tr>
+                    <td style="color: var(--text-muted);">Email:</td>
+                    <td>{{ record.author.email or 'Chưa cung cấp' }}</td>
+                </tr>
+                <tr>
+                    <td style="color: var(--text-muted);">Website:</td>
+                    <td>{{ record.author.link or 'Chưa cung cấp' }}</td>
+                </tr>
+                <tr>
+                    <td style="color: var(--text-muted);">Thời gian lưu:</td>
+                    <td>{{ record.timestamp }}</td>
+                </tr>
+                <tr>
+                    <td style="color: var(--text-muted);">Số bit:</td>
+                    <td>{{ record.bits_length }} bits</td>
+                </tr>
+            </table>
+        </div>
+    </div>
+    {% else %}
+    <div
+        style="background-color: #fff1f2; border: 1px solid #fecdd3; border-radius: var(--radius-md); padding: 14px 16px; margin-top: 14px; font-size: 13px; color: #9f1239;">
+        <div style="font-weight: 600; margin-bottom: 4px;">Nguyên nhân có thể:</div>
+        <ul style="margin-left: 18px; line-height: 1.6;">
+            <li>Ảnh chưa từng được đăng ký bảo vệ bản quyền trên Sổ cái này.</li>
+            <li>Hoặc ảnh đã bị nén JPEG, chỉnh sửa màu sắc, cắt xén làm thay đổi mã SHA-256 (Hiệu ứng tuyết lở Avalanche
+                Effect: sai khác dù chỉ 1 bit cũng làm đổi toàn bộ mã băm).</li>
+        </ul>
+    </div>
+    {% endif %}
+</div>
+
+<div style="display: flex; gap: 10px;">
+    <a href="{{ url_for('index') }}" class="btn btn-secondary">
+        Quay lại trang chủ
+    </a>
+    <a href="{{ url_for('ledger_view') }}" class="btn btn-outline">
+        Xem Sổ cái Blockchain &rarr;
+    </a>
+</div>
+
+{% endblock %}

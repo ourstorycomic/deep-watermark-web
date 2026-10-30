@@ -1,0 +1,148 @@
+<!-- templates/benchmark.html -->
+{% extends "base.html" %}
+{% block content %}
+
+<div style="margin-bottom: 24px;">
+    <h1 style="font-size: 20px; font-weight: 700; color: var(--text-main); margin-bottom: 4px;">
+        Phòng Thí Nghiệm Khảo Sát Tính Bền Vững (Robustness Benchmark Lab)
+    </h1>
+    <p style="font-size: 13.5px; color: var(--text-muted);">
+        Khảo sát năng lực tồn tại của watermark và vai trò của Blockchain SHA-256 trước các dạng tấn công / xử lý ảnh phổ biến.
+    </p>
+</div>
+
+<!-- Form thiết lập thử nghiệm -->
+<div class="card" style="margin-bottom: 24px;">
+    <div class="card-header">
+        <div class="card-title">
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1 0 2.83 2 2 0 0 1-2.83 0l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-2 2 2 2 0 0 1-2-2v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83 0 2 2 0 0 1 0-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1-2-2 2 2 0 0 1 2-2h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 0-2.83 2 2 0 0 1 2.83 0l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 2-2 2 2 0 0 1 2 2v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 0 2 2 0 0 1 0 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 2 2 2 2 0 0 1-2 2h-.09a1.65 1.65 0 0 0-1.51 1z"/></svg>
+            Thiết Lập Thử Nghiệm Tấn Công Khảo Sát
+        </div>
+    </div>
+
+    <form action="{{ url_for('benchmark') }}" method="post" enctype="multipart/form-data">
+        <div class="grid-2">
+            <div>
+                <div class="form-group">
+                    <label>1. Chọn ảnh Stego đã nhúng Watermark:</label>
+                    <input type="file" name="image" id="benchInput" class="form-control" accept="image/*" onchange="previewImage(this, 'benchPreview')">
+                    <img id="benchPreview" class="preview-img" alt="Xem trước ảnh khảo sát">
+                </div>
+
+                {% if available_samples %}
+                <div class="form-group">
+                    <label>Hoặc chọn ảnh mẫu có sẵn trên hệ thống:</label>
+                    <select name="sample_filename" class="form-control">
+                        <option value="">-- Chọn ảnh mẫu có sẵn --</option>
+                        {% for s in available_samples %}
+                        <option value="{{ s.filename }}" {% if selected_filename == s.filename %}selected{% endif %}>
+                            {{ s.filename }} (Tác giả: {{ s.author }})
+                        </option>
+                        {% endfor %}
+                    </select>
+                </div>
+                {% endif %}
+            </div>
+
+            <div>
+                <div class="form-group">
+                    <label>2. Chuỗi Watermark Gốc (Để tính sai số BER):</label>
+                    <input type="text" name="secret_text" class="form-control" value="{{ secret_text or '' }}" placeholder="VD: @2025-hoangminhhieu hoặc Chữ ký..." required>
+                    <div class="form-text">Chuỗi này dùng để so khớp với dữ liệu giải mã sau khi bị biến đổi để tính tỉ lệ lỗi bit.</div>
+                </div>
+
+                <div class="form-group">
+                    <label>3. Số lượng bits watermark:</label>
+                    <input type="number" name="bits_len" class="form-control" value="{{ bits_len or 160 }}" min="8" max="10000">
+                    <div class="form-text">Độ dài bit đã lưu trên Sổ cái. Hệ thống sẽ tự tính toán nếu để trống.</div>
+                </div>
+
+                <div style="margin-top: 24px;">
+                    <button type="submit" class="btn btn-primary btn-block">
+                        <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polygon points="5 3 19 12 5 21 5 3"/></svg>
+                        Khởi Chạy 5 Phép Thử Nghiệm Tấn Công
+                    </button>
+                </div>
+            </div>
+        </div>
+    </form>
+</div>
+
+<!-- Kết quả khảo sát -->
+{% if attack_results %}
+<div class="card" style="margin-bottom: 24px;">
+    <div class="card-header">
+        <div class="card-title">
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="22 12 18 12 15 21 9 3 6 12 2 12"/></svg>
+            Bảng Số Liệu Khảo Sát Thực Nghiệm (Experimental Survey Results)
+        </div>
+    </div>
+
+    <div style="background-color: var(--primary-light); border-left: 3px solid var(--primary); padding: 12px 16px; border-radius: 4px; margin-bottom: 18px; font-size: 13.5px; color: var(--text-sub);">
+        <strong>Nhận định học thuật cho bài báo cáo:</strong>
+        <p style="margin-top: 4px; margin-bottom: 0; line-height: 1.6;">
+            Kỹ thuật giấu tin miền không gian <strong>Spatial LSB</strong> có ưu điểm vượt trội về độ tàng hình thị giác (PSNR rất cao, không làm biến dạng cảm nhận thị giác), nhưng nhạy cảm với các phép biến đổi mất mát thông tin (Lossy Transformation) như nén JPEG hoặc lọc mờ.
+            Mô hình kết hợp <strong>Blockchain Sổ cái (SHA-256)</strong> giải quyết trọn vẹn bài toán này: <strong>100% các cuộc tấn công đều bị phát hiện ngay lập tức</strong> thông qua hàm băm bất biến.
+        </p>
+    </div>
+
+    <div class="table-responsive">
+        <table>
+            <thead>
+                <tr>
+                    <th style="width: 22%;">Kịch Bản Tấn Công</th>
+                    <th style="width: 18%;">Nhóm Xử Lý</th>
+                    <th style="width: 20%;">Chuỗi Trích Xuất Được</th>
+                    <th style="width: 10%;">Tỉ Lệ Lỗi (BER)</th>
+                    <th style="width: 12%;">Watermark Sống?</th>
+                    <th style="width: 18%;">Blockchain Cảnh Báo</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for r in attack_results %}
+                <tr>
+                    <td>
+                        <strong>{{ r.name }}</strong>
+                        <div style="font-size: 11.5px; color: var(--text-muted); margin-top: 2px;">{{ r.description }}</div>
+                    </td>
+                    <td><span class="badge badge-info">{{ r.category }}</span></td>
+                    <td>
+                        <code>{{ r.extracted_text or '[Rỗng]' }}</code>
+                    </td>
+                    <td>
+                        <strong style="color: {% if r.ber == '0.0%' %}var(--success){% else %}var(--danger){% endif %};">
+                            {{ r.ber }}
+                        </strong>
+                    </td>
+                    <td>
+                        {% if r.watermark_intact %}
+                            <span class="badge badge-success">Còn nguyên</span>
+                        {% else %}
+                            <span class="badge badge-danger">Bị biến dạng</span>
+                        {% endif %}
+                    </td>
+                    <td>
+                        {% if r.tamper_detected %}
+                            <span class="badge badge-danger">Phát hiện can thiệp</span>
+                        {% else %}
+                            <span class="badge badge-success">Toàn vẹn</span>
+                        {% endif %}
+                    </td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+</div>
+{% endif %}
+
+<div style="display: flex; gap: 10px;">
+    <a href="{{ url_for('index') }}" class="btn btn-secondary">
+        Quay lại trang chủ
+    </a>
+    <a href="{{ url_for('theory') }}" class="btn btn-outline">
+        Xem Báo cáo Cơ sở Lý thuyết &rarr;
+    </a>
+</div>
+
+{% endblock %}

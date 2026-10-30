@@ -1,0 +1,123 @@
+<!-- templates/ledger.html -->
+{% extends "base.html" %}
+{% block content %}
+
+<div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 24px; flex-wrap: wrap; gap: 12px;">
+    <div>
+        <h1 style="font-size: 20px; font-weight: 700; color: var(--text-main); margin-bottom: 4px;">
+            Sổ cái Bản quyền Blockchain (Ledger Explorer)
+        </h1>
+        <p style="font-size: 13.5px; color: var(--text-muted);">
+            Danh mục các giao dịch phân tán ghi nhận mã băm SHA-256 của ảnh, chữ ký bản quyền và tham số giấu tin.
+        </p>
+    </div>
+    <div>
+        <a href="{{ url_for('index') }}" class="btn btn-primary" style="padding: 8px 16px;">
+            <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
+            Đăng ký Ảnh Mới
+        </a>
+    </div>
+</div>
+
+<!-- Thống kê tổng quan -->
+<div class="grid-4">
+    <div class="stat-card">
+        <div class="label">Tổng số khối (Blocks)</div>
+        <div class="value">{{ stats.total_records }}</div>
+    </div>
+    <div class="stat-card">
+        <div class="label">Tổng bits bản quyền</div>
+        <div class="value">{{ stats.total_bits_embedded }} bits</div>
+    </div>
+    <div class="stat-card">
+        <div class="label">Độ dài bit trung bình</div>
+        <div class="value">{{ stats.avg_bits_length }} bits</div>
+    </div>
+    <div class="stat-card">
+        <div class="label">Trạng thái Sổ cái</div>
+        <div class="value" style="font-size: 16px; color: var(--success); font-weight: 600;">Hoạt động (Active)</div>
+    </div>
+</div>
+
+<!-- Thanh tìm kiếm -->
+<div class="card" style="margin-bottom: 20px; padding: 16px 20px;">
+    <form method="get" action="{{ url_for('ledger_view') }}" style="display: flex; gap: 10px; align-items: center;">
+        <input type="text" name="q" value="{{ query or '' }}" class="form-control" placeholder="Tìm kiếm theo tên tác giả, email, Tx Hash hoặc Image Hash..." style="flex: 1;">
+        <button type="submit" class="btn btn-primary">Tìm kiếm</button>
+        {% if query %}
+            <a href="{{ url_for('ledger_view') }}" class="btn btn-secondary">Xóa bộ lọc</a>
+        {% endif %}
+    </form>
+</div>
+
+<!-- Bảng dữ liệu sổ cái -->
+<div class="card">
+    <div class="card-header">
+        <div class="card-title">
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><ellipse cx="12" cy="5" rx="9" ry="3"/><path d="M21 12c0 1.66-4 3-9 3s-9-1.34-9-3"/><path d="M3 5v14c0 1.66 4 3 9 3s9-1.34 9-3V5"/></svg>
+            Danh sách Bản ghi Đã Đăng ký ({{ records|length }} bản ghi)
+        </div>
+    </div>
+
+    {% if records %}
+    <div class="table-responsive">
+        <table>
+            <thead>
+                <tr>
+                    <th style="width: 18%;">Thời gian (UTC)</th>
+                    <th style="width: 22%;">Tác giả & Email</th>
+                    <th style="width: 22%;">Mã Giao Dịch (Tx Hash)</th>
+                    <th style="width: 22%;">Image Hash (SHA-256)</th>
+                    <th style="width: 8%;">Số Bit</th>
+                    <th style="width: 8%;">Cấu hình</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for r in records %}
+                {% set author = r.get('author', {}) or {} %}
+                {% set tx = r.get('tx_hash', '') %}
+                {% set im_h = r.get('image_hash', '') %}
+                {% set sp = r.get('stego_params', {}) or {} %}
+                <tr>
+                    <td>
+                        <span style="font-size: 12.5px; color: var(--text-muted);">{{ r.get('timestamp', '') }}</span>
+                    </td>
+                    <td>
+                        <div style="font-weight: 600;">{{ author.get('name') or 'Chưa rõ' }}</div>
+                        <div style="font-size: 12px; color: var(--text-muted);">{{ author.get('email') or '' }}</div>
+                    </td>
+                    <td>
+                        {% if tx %}
+                            <code title="{{ tx }}">{{ tx[:12] }}...{{ tx[-8:] }}</code>
+                        {% else %}
+                            <span style="color: var(--text-muted);">-</span>
+                        {% endif %}
+                    </td>
+                    <td>
+                        {% if im_h %}
+                            <code title="{{ im_h }}">{{ im_h[:12] }}...{{ im_h[-8:] }}</code>
+                        {% else %}
+                            <span style="color: var(--text-muted);">-</span>
+                        {% endif %}
+                    </td>
+                    <td>
+                        <strong>{{ r.get('bits_length', 0) }}</strong>
+                    </td>
+                    <td>
+                        <span class="badge badge-info">
+                            {{ sp.get('channel', 'G') }}-{{ sp.get('bit_depth', 1) }}L
+                        </span>
+                    </td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+    {% else %}
+        <div style="text-align: center; padding: 36px; color: var(--text-muted);">
+            Không tìm thấy bản ghi nào phù hợp.
+        </div>
+    {% endif %}
+</div>
+
+{% endblock %}

@@ -1,0 +1,150 @@
+{% extends "base.html" %}
+{% block content %}
+
+<!-- Top Stat Indicators -->
+<div class="grid-4">
+    <div class="stat-card">
+        <div class="label">Bản ghi trên Sổ cái</div>
+        <div class="value">{{ stats.total_records }}</div>
+    </div>
+    <div class="stat-card">
+        <div class="label">Tổng số bit đã nhúng</div>
+        <div class="value">{{ stats.total_bits_embedded }} bits</div>
+    </div>
+    <div class="stat-card">
+        <div class="label">Độ dài bit trung bình</div>
+        <div class="value">{{ stats.avg_bits_length }} bits</div>
+    </div>
+    <div class="stat-card">
+        <div class="label">Phương pháp Giấu tin</div>
+        <div class="value" style="font-size: 17px; color: var(--primary); font-weight: 600;">Spatial LSB + SHA-256</div>
+    </div>
+</div>
+
+<div class="grid-2">
+    <!-- Form 1: Nhúng Watermark -->
+    <div class="card">
+        <div class="card-header">
+            <div class="card-title">
+                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 19l7-7 3 3-7 7-3-3z"/><path d="M18 13l-1.5-7.5L2 2l3.5 14.5L13 18l5-5z"/><path d="M2 2l7.586 7.586"/><circle cx="11" cy="11" r="2"/></svg>
+                Nhúng Watermark & Bảo vệ Bản quyền
+            </div>
+        </div>
+        <p style="font-size: 13.5px; color: var(--text-muted); margin-bottom: 18px;">
+            Nhúng thông tin bản quyền ẩn vào ảnh chữ ký / tài liệu. Mắt thường không thể nhìn thấy, tự động đối soát toàn vẹn bằng Blockchain.
+        </p>
+
+        <form action="{{ url_for('embed') }}" method="post" enctype="multipart/form-data">
+            <div class="form-group">
+                <label>1. Chọn ảnh gốc (PNG / JPG / BMP):</label>
+                <input type="file" name="image" id="origInput" class="form-control" accept="image/*" required onchange="previewImage(this, 'origPreview')">
+                <img id="origPreview" class="preview-img" alt="Xem trước ảnh gốc">
+            </div>
+
+            <div class="form-group">
+                <label>2. Nội dung Watermark (Chữ ký / Thông điệp bí mật):</label>
+                <textarea name="watermark_text" class="form-control" rows="3" placeholder="VD: © 2026 Chữ ký Bản quyền Giám đốc Nguyễn Văn A..." required></textarea>
+                <div class="form-text">Hỗ trợ đầy đủ tiếng Việt (UTF-8), ký tự đặc biệt, biểu tượng ©, ®.</div>
+            </div>
+
+            <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 12px;">
+                <div class="form-group">
+                    <label>Tác giả / Người ký:</label>
+                    <input type="text" name="author_name" class="form-control" placeholder="Nguyễn Văn A">
+                </div>
+                <div class="form-group">
+                    <label>Email liên hệ:</label>
+                    <input type="email" name="author_email" class="form-control" placeholder="tacgia@example.com">
+                </div>
+            </div>
+
+            <div class="form-group">
+                <label>Liên kết xác minh / Website:</label>
+                <input type="text" name="author_link" class="form-control" placeholder="https://example.com/verify">
+            </div>
+
+            <!-- Tùy chọn nâng cao ẩn mặc định dành cho khảo sát học thuật -->
+            <details style="background-color: #f8fafc; border: 1px solid var(--border-color); border-radius: var(--radius-md); padding: 10px 14px; margin-bottom: 18px;">
+                <summary style="font-size: 12.5px; font-weight: 600; color: var(--text-sub); cursor: pointer; user-select: none;">
+                    ⚙️ Tùy chọn nâng cao (Dành cho bài khảo sát / thí nghiệm của Thầy)
+                </summary>
+                <div style="margin-top: 10px; padding-top: 10px; border-top: 1px solid var(--border-color);">
+                    <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 12px;">
+                        <div>
+                            <label style="font-size: 12px; color: var(--text-sub); display: block; margin-bottom: 4px;">Kênh màu nhúng:</label>
+                            <select name="channel" class="form-control" style="padding: 6px 10px; font-size: 12.5px;">
+                                <option value="G" selected>Kênh G (Green - Chuẩn mắt người)</option>
+                                <option value="B">Kênh B (Blue - Mắt ít nhạy cảm)</option>
+                                <option value="R">Kênh R (Red - Kênh đỏ)</option>
+                                <option value="RGB">Kênh RGB (Tuần tự 3 kênh)</option>
+                            </select>
+                        </div>
+                        <div>
+                            <label style="font-size: 12px; color: var(--text-sub); display: block; margin-bottom: 4px;">Độ sâu bit (Bit Depth):</label>
+                            <select name="bit_depth" class="form-control" style="padding: 6px 10px; font-size: 12.5px;">
+                                <option value="1" selected>1-LSB (Khuyên dùng - PSNR &gt; 70 dB)</option>
+                                <option value="2">2-LSB (Gấp đôi dung lượng, PSNR ~50 dB)</option>
+                            </select>
+                        </div>
+                    </div>
+                    <div class="form-text" style="font-size: 11.5px; margin-top: 6px;">
+                        Mặc định hệ thống đã chọn cấu hình tối ưu nhất (Kênh G, 1-LSB). Người dùng phổ thông không cần thay đổi.
+                    </div>
+                </div>
+            </details>
+
+            <button type="submit" class="btn btn-primary btn-block">
+                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="17 8 12 3 7 8"/><line x1="12" y1="3" x2="12" y2="15"/></svg>
+                Nhúng Watermark & Đo Chỉ Số
+            </button>
+        </form>
+    </div>
+
+    <!-- Form 2: Xác thực ảnh -->
+    <div class="card">
+        <div class="card-header">
+            <div class="card-title">
+                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"/><polyline points="22 4 12 14.01 9 11.01"/></svg>
+                Xác thực Ảnh & Kiểm tra Toàn vẹn
+            </div>
+        </div>
+        <p style="font-size: 13.5px; color: var(--text-muted); margin-bottom: 18px;">
+            Đối chiếu mã băm SHA-256 của ảnh với sổ cái Blockchain phân tán, giải mã watermark LSB và phát hiện các can thiệp trái phép.
+        </p>
+
+        <form action="{{ url_for('verify') }}" method="post" enctype="multipart/form-data">
+            <div class="form-group">
+                <label>Chọn ảnh cần kiểm tra (Ảnh đã watermark hoặc nghi ngờ):</label>
+                <input type="file" name="image" id="verifyInput" class="form-control" accept="image/*" required onchange="previewImage(this, 'verifyPreview')">
+                <img id="verifyPreview" class="preview-img" alt="Xem trước ảnh xác minh">
+                <div class="form-text">Hệ thống chấp nhận mọi định dạng ảnh và đối soát trực tiếp với Sổ cái.</div>
+            </div>
+
+            <div style="background-color: #f8fafc; border-left: 3px solid var(--primary); padding: 12px 14px; border-radius: 4px; margin-bottom: 18px; font-size: 13px; color: var(--text-sub);">
+                <div style="font-weight: 600; margin-bottom: 4px;">Quy trình đối soát:</div>
+                <div style="line-height: 1.6;">
+                    1. Tính SHA-256 Digest của toàn bộ tệp ảnh.<br>
+                    2. Tra cứu bản ghi nguồn gốc trên Sổ cái Blockchain.<br>
+                    3. Trích xuất chuỗi LSB theo tham số ban đầu.<br>
+                    4. Đối chiếu mã băm chữ ký để khẳng định tính nguyên bản.
+                </div>
+            </div>
+
+            <button type="submit" class="btn btn-primary btn-block" style="background-color: var(--success);">
+                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg>
+                Tiến hành Xác thực Ảnh
+            </button>
+        </form>
+
+        <div style="margin-top: 24px; padding-top: 18px; border-top: 1px solid var(--border-color);">
+            <div style="font-size: 13px; color: var(--text-muted); margin-bottom: 10px;">
+                Cần khảo sát khả năng chống chịu tấn công (Nén JPEG, Blur, Nhiễu)?
+            </div>
+            <a href="{{ url_for('benchmark') }}" class="btn btn-outline btn-block">
+                Mở Phòng Thí Nghiệm Khảo Sát Tấn Công &rarr;
+            </a>
+        </div>
+    </div>
+</div>
+
+{% endblock %}
