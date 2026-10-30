@@ -18,9 +18,15 @@ import watermark as wm
 import blockchain_mock as bc
 import metrics as mt
 
-# Cấu hình thư mục lưu ảnh
+# Cấu hình thư mục lưu ảnh (tương thích Vercel Serverless Read-Only Filesystem)
 BASE_DIR = os.path.dirname(os.path.abspath(__file__))
-UPLOAD_FOLDER = os.environ.get("UPLOAD_FOLDER", os.path.join(BASE_DIR, "static", "uploads"))
+IS_VERCEL = bool(os.environ.get("VERCEL"))
+
+if IS_VERCEL:
+    UPLOAD_FOLDER = "/tmp/uploads"
+else:
+    UPLOAD_FOLDER = os.environ.get("UPLOAD_FOLDER", os.path.join(BASE_DIR, "static", "uploads"))
+
 os.makedirs(UPLOAD_FOLDER, exist_ok=True)
 
 app = Flask(__name__)
@@ -32,26 +38,30 @@ app.config["SEND_FILE_MAX_AGE_DEFAULT"] = 0
 def get_available_samples():
     """Lấy danh sách các tệp ảnh mẫu có trong thư mục uploads kèm thông tin tác giả nếu có"""
     samples = []
-    if os.path.exists(app.config["UPLOAD_FOLDER"]):
-        ledger = bc.get_all_records()
-        # Tạo map từ tên file sang record nếu có
-        for fname in os.listdir(app.config["UPLOAD_FOLDER"]):
-            if fname.lower().endswith((".png", ".jpg", ".jpeg", ".bmp")):
-                # Tìm tác giả trong ledger nếu có
-                fpath = os.path.join(app.config["UPLOAD_FOLDER"], fname)
-                author_name = "Chưa rõ"
-                try:
-                    with open(fpath, "rb") as f:
-                        img_h = bc.sha256_bytes(f.read())
-                    if img_h in ledger:
-                        author_name = ledger[img_h].get("author", {}).get("name", "Đã lưu sổ cái")
-                except Exception:
-                    pass
+    # Tìm kiếm cả trong uploads tạm và uploads của repo
+    search_dirs = [app.config["UPLOAD_FOLDER"], os.path.join(BASE_DIR, "static", "uploads")]
+    seen = set()
+    ledger = bc.get_all_records()
 
-                samples.append({
-                    "filename": fname,
-                    "author": author_name
-                })
+    for sdir in search_dirs:
+        if os.path.exists(sdir):
+            for fname in os.listdir(sdir):
+                if fname.lower().endswith((".png", ".jpg", ".jpeg", ".bmp")) and fname not in seen:
+                    seen.add(fname)
+                    fpath = os.path.join(sdir, fname)
+                    author_name = "Chưa rõ"
+                    try:
+                        with open(fpath, "rb") as f:
+                            img_h = bc.sha256_bytes(f.read())
+                        if img_h in ledger:
+                            author_name = ledger[img_h].get("author", {}).get("name", "Đã lưu sổ cái")
+                    except Exception:
+                        pass
+
+                    samples.append({
+                        "filename": fname,
+                        "author": author_name
+                    })
     return samples
 
 @app.route("/")
@@ -127,7 +137,7 @@ def embed():
             stego_params=stego_params
         )
 
-        # 4. Lưu ảnh đã giấu tin vào thư mục static/uploads
+        # 4. Lưu ảnh đã giấu tin
         filename = secure_filename(file.filename)
         base, _ = os.path.splitext(filename)
         base = "".join(c for c in base if c.isalnum() or c in "._-")
@@ -140,10 +150,10 @@ def embed():
             f.write(stego_bytes)
 
         # URL hiển thị và download
-        image_url = url_for("static", filename=f"uploads/{out_name}")
+        image_url = url_for("view_upload", filename=out_name)
         download_url = url_for("download_file", filename=out_name)
 
-        flash("✅ Nhúng watermark thành công & đã tính toán các chỉ số khảo sát!", "success")
+        flash("Nhúng watermark thành công và đã lưu bằng chứng lên Sổ cái!", "success")
 
         return render_template(
             "result_embed.html",
@@ -185,7 +195,7 @@ def verify():
                 "result_verify.html",
                 status="NOT_FOUND",
                 image_hash=image_hash,
-                message="❌ Không tìm thấy bản ghi trên sổ cái. Ảnh này chưa từng được đăng ký, hoặc đã bị chỉnh sửa/nén lại làm thay đổi mã SHA-256."
+                message="Không tìm thấy bản ghi trên sổ cái. Ảnh này chưa từng được đăng ký, hoặc đã bị chỉnh sửa/nén lại làm thay đổi mã SHA-256."
             )
 
         # 2. Trích xuất watermark theo cấu hình lúc đăng ký
@@ -207,9 +217,9 @@ def verify():
         status = "VALID" if is_valid else "TAMPERED"
 
         if is_valid:
-            message = "✅ Xác thực thành công: Ảnh hợp lệ 100%, watermark trích xuất hoàn toàn trùng khớp với bản ghi bảo vệ trên sổ cái."
+            message = "Xác thực thành công: Ảnh hợp lệ 100%, watermark trích xuất hoàn toàn trùng khớp với bản ghi bảo vệ trên sổ cái."
         else:
-            message = "⚠️ Cảnh báo: Ảnh có chứa dữ liệu giấu tin nhưng không khớp chữ ký gốc trên Blockchain. Dữ liệu ảnh đã bị chỉnh sửa hoặc sửa đổi."
+            message = "Cảnh báo: Ảnh có chứa dữ liệu giấu tin nhưng không khớp chữ ký gốc trên Blockchain. Dữ liệu ảnh đã bị chỉnh sửa hoặc sửa đổi."
 
         return render_template(
             "result_verify.html",
@@ -238,16 +248,17 @@ def benchmark():
     if request.method == "POST":
         try:
             stego_bytes = None
-            # Trường hợp 1: Tải file lên
             if "image" in request.files and request.files["image"].filename:
                 file = request.files["image"]
                 stego_bytes = file.read()
-            # Trường hợp 2: Chọn từ file mẫu
             elif request.form.get("sample_filename"):
                 sample_name = secure_filename(request.form.get("sample_filename"))
-                sample_path = os.path.join(app.config["UPLOAD_FOLDER"], sample_name)
-                if os.path.exists(sample_path):
-                    with open(sample_path, "rb") as f:
+                # Tìm trong uploads tạm hoặc repo uploads
+                s_path = os.path.join(app.config["UPLOAD_FOLDER"], sample_name)
+                if not os.path.exists(s_path):
+                    s_path = os.path.join(BASE_DIR, "static", "uploads", sample_name)
+                if os.path.exists(s_path):
+                    with open(s_path, "rb") as f:
                         stego_bytes = f.read()
                     selected_filename = sample_name
 
@@ -255,30 +266,27 @@ def benchmark():
                 flash("Vui lòng tải lên ảnh hoặc chọn một ảnh mẫu", "error")
                 return redirect(url_for("benchmark"))
 
-            # Tự động suy ra độ dài bits nếu chưa có
             if not secret_text:
                 secret_text = "Watermark Test"
             calc_bits = len(secret_text.encode("utf-8")) * 8
             bits_len = max(bits_len, calc_bits)
 
-            # Khởi chạy bộ 5 phép thử nghiệm tấn công
             attack_results = mt.run_attack_benchmark(stego_bytes, secret_text, bits_len)
-            flash("✅ Đã hoàn thành 5 phép thử nghiệm tấn công khảo sát!", "success")
+            flash("Đã hoàn thành 5 phép thử nghiệm tấn công khảo sát!", "success")
 
         except Exception as e:
             flash(f"Lỗi chạy thử nghiệm: {str(e)}", "error")
 
-    # Nếu đến từ liên kết có tham số filename
     elif selected_filename:
-        # Tự động tìm watermark trong sổ cái nếu ảnh đã được đăng ký
         target_path = os.path.join(app.config["UPLOAD_FOLDER"], selected_filename)
+        if not os.path.exists(target_path):
+            target_path = os.path.join(BASE_DIR, "static", "uploads", selected_filename)
         if os.path.exists(target_path):
             with open(target_path, "rb") as f:
                 img_data = f.read()
             h, rec = bc.verify_image(img_data)
             if rec:
                 bits_len = rec.get("bits_length", 160)
-                # Thử trích xuất để làm gợi ý
                 params = rec.get("stego_params") or {}
                 extracted = wm.extract_watermark_lsb(
                     img_data,
@@ -310,6 +318,19 @@ def theory():
     """Báo cáo Cơ sở Lý thuyết phục vụ đề tài nghiên cứu"""
     return render_template("theory.html")
 
+@app.route("/view-upload/<path:filename>")
+def view_upload(filename):
+    """Xem ảnh trực tiếp (tương thích cả /tmp/uploads trên Vercel và static/uploads)"""
+    safe_name = os.path.basename(filename)
+    path = os.path.join(app.config["UPLOAD_FOLDER"], safe_name)
+    if not os.path.exists(path):
+        repo_path = os.path.join(BASE_DIR, "static", "uploads", safe_name)
+        if os.path.exists(repo_path):
+            path = repo_path
+        else:
+            return "File not found", 404
+    return send_file(path, mimetype="image/png")
+
 @app.route("/download/<path:filename>")
 def download_file(filename):
     """Tải tệp ảnh đã watermark về máy"""
@@ -318,8 +339,12 @@ def download_file(filename):
         path = os.path.join(app.config["UPLOAD_FOLDER"], safe_name)
 
         if not os.path.exists(path):
-            flash("Tệp tin không tồn tại hoặc đã bị xóa", "error")
-            return redirect(url_for("index"))
+            repo_path = os.path.join(BASE_DIR, "static", "uploads", safe_name)
+            if os.path.exists(repo_path):
+                path = repo_path
+            else:
+                flash("Tệp tin không tồn tại hoặc đã bị xóa", "error")
+                return redirect(url_for("index"))
 
         return send_file(
             path,
@@ -333,7 +358,6 @@ def download_file(filename):
 
 @app.route("/api/records")
 def api_records():
-    """API trả về danh sách bản ghi blockchain dạng JSON"""
     return jsonify({
         "status": "success",
         "data": bc.get_all_records()
@@ -343,6 +367,7 @@ def api_records():
 def health():
     return jsonify({
         "status": "healthy",
+        "is_vercel": IS_VERCEL,
         "upload_folder": app.config["UPLOAD_FOLDER"],
         "total_records": len(bc.get_all_records())
     })

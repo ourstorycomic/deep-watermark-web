@@ -2,30 +2,40 @@
 # blockchain_mock.py
 import json
 import os
+import shutil
 import hashlib
 from datetime import datetime
 
-# Đường dẫn file ledger trong thư mục dự án
-DEFAULT_LEDGER = os.path.join(os.path.dirname(os.path.abspath(__file__)), "ledger.json")
-LEDGER_FILE = os.environ.get("LEDGER_FILE", DEFAULT_LEDGER)
+IS_VERCEL = bool(os.environ.get("VERCEL"))
+INITIAL_LEDGER = os.path.join(os.path.dirname(os.path.abspath(__file__)), "ledger.json")
+
+if IS_VERCEL:
+    LEDGER_FILE = "/tmp/ledger.json"
+    if not os.path.exists(LEDGER_FILE) and os.path.exists(INITIAL_LEDGER):
+        try:
+            os.makedirs(os.path.dirname(LEDGER_FILE), exist_ok=True)
+            shutil.copyfile(INITIAL_LEDGER, LEDGER_FILE)
+        except Exception as e:
+            print(f"Error copying initial ledger on Vercel: {e}")
+else:
+    DEFAULT_LEDGER = INITIAL_LEDGER
+    LEDGER_FILE = os.environ.get("LEDGER_FILE", DEFAULT_LEDGER)
 
 def sha256_bytes(data: bytes) -> str:
     """Tính mã băm SHA256 của chuỗi bytes"""
     return hashlib.sha256(data).hexdigest()
 
 def _normalize_record(record: dict) -> dict:
-    """Chuẩn hóa dữ liệu bản ghi để luôn có đầy đủ trường (tương thích các bản ghi cũ)"""
+    """Chuẩn hóa dữ liệu bản ghi để luôn có đầy đủ trường"""
     if not isinstance(record, dict):
         return record
 
     im_h = record.get("image_hash", "")
     wm_h = record.get("watermark_hash", "")
 
-    # Đảm bảo luôn có tx_hash
     if "tx_hash" not in record or not record["tx_hash"]:
         record["tx_hash"] = sha256_bytes((im_h + wm_h).encode("utf-8"))
 
-    # Đảm bảo luôn có stego_params
     if "stego_params" not in record or not isinstance(record["stego_params"], dict):
         record["stego_params"] = {
             "channel": "G",
@@ -34,7 +44,6 @@ def _normalize_record(record: dict) -> dict:
             "ssim": 0.9999
         }
 
-    # Đảm bảo luôn có author dict
     if "author" not in record or not isinstance(record["author"], dict):
         record["author"] = {"name": "", "email": "", "link": ""}
 
@@ -42,10 +51,14 @@ def _normalize_record(record: dict) -> dict:
 
 def _load_ledger():
     """Đọc ledger từ file JSON và chuẩn hóa bản ghi"""
-    if not os.path.exists(LEDGER_FILE):
-        return {}
+    target = LEDGER_FILE
+    if not os.path.exists(target):
+        if os.path.exists(INITIAL_LEDGER):
+            target = INITIAL_LEDGER
+        else:
+            return {}
     try:
-        with open(LEDGER_FILE, "r", encoding="utf-8") as f:
+        with open(target, "r", encoding="utf-8") as f:
             data = json.load(f)
         if isinstance(data, dict):
             normalized = {}

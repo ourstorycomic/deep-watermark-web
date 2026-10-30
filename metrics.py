@@ -3,15 +3,14 @@
 """
 Mô-đun tính toán các chỉ số khảo sát chất lượng ảnh giấu tin (Steganography Quality Metrics)
 và mô phỏng các dạng tấn công (Attack Robustness Benchmark).
+Tối ưu hóa gọn nhẹ (chỉ dùng NumPy và Pillow), tương thích 100% với Vercel Serverless.
 """
 
 import io
+import math
 import base64
 import numpy as np
-import cv2
 from PIL import Image, ImageEnhance, ImageFilter
-from skimage.metrics import peak_signal_noise_ratio as psnr_calc
-from skimage.metrics import structural_similarity as ssim_calc
 
 import watermark as wm
 import blockchain_mock as bc
@@ -46,34 +45,40 @@ def calculate_quality_metrics(orig_bytes: bytes, stego_bytes: bytes, bits_len: i
         # 1. MSE
         mse = float(np.mean((orig_arr - stego_arr) ** 2))
 
-        # 2. PSNR
+        # 2. PSNR (dB)
         if mse == 0:
-            psnr = 100.0  # Không có sai lệch
+            psnr = 100.0
         else:
-            psnr = float(psnr_calc(orig_arr.astype(np.uint8), stego_arr.astype(np.uint8)))
+            psnr = float(10.0 * math.log10((255.0 ** 2) / mse))
 
-        # 3. SSIM
-        ssim = float(ssim_calc(orig_arr.astype(np.uint8), stego_arr.astype(np.uint8), channel_axis=2))
+        # 3. SSIM (Structural Similarity Index)
+        C1 = (0.01 * 255) ** 2
+        C2 = (0.03 * 255) ** 2
+        mu1 = np.mean(orig_arr)
+        mu2 = np.mean(stego_arr)
+        var1 = np.var(orig_arr)
+        var2 = np.var(stego_arr)
+        cov = np.mean((orig_arr - mu1) * (stego_arr - mu2))
+        ssim = float(((2 * mu1 * mu2 + C1) * (2 * cov + C2)) / ((mu1**2 + mu2**2 + C1) * (var1 + var2 + C2)))
 
         # 4. Payload & Capacity
         bpp = round(bits_len / total_pixels, 6)
         capacity_percent = round((bits_len / total_pixels) * 100, 4)
 
         # 5. Difference Map trực quan:
-        # Nhận diện chính xác pixel nào bị thay đổi dù chỉ 1 bit
         diff_arr = np.abs(orig_arr - stego_arr)
-        mask = np.any(diff_arr > 0, axis=2).astype(np.uint8)
-        changed_pixel_count = int(np.sum(mask))
+        mask = np.any(diff_arr > 0, axis=2).astype(np.uint8) * 255
+        changed_pixel_count = int(np.sum(mask > 0))
 
-        # Tạo bản đồ vi sai: Nền xám đen kỹ thuật, pixel đổi bit được highlight màu đỏ rực
+        # Nền xám đen kỹ thuật số, pixel đổi bit được highlight màu đỏ rực
         diff_vis = np.zeros((h, w, 3), dtype=np.uint8)
         diff_vis[:] = [15, 23, 42]  # Nền tối Slate 900
 
         if changed_pixel_count > 0:
-            # Phóng to nhẹ vùng pixel để mắt người quan sát được ngay cả khi ảnh có độ phân giải lớn
-            kernel = np.ones((3, 3), np.uint8)
-            dilated = cv2.dilate(mask, kernel, iterations=1)
-            diff_vis[dilated > 0] = [239, 68, 68]  # Đỏ nổi bật (Red highlight)
+            # Dùng MaxFilter(3) từ Pillow (tương đương phép dãn Dilate 3x3)
+            pil_mask = Image.fromarray(mask).filter(ImageFilter.MaxFilter(3))
+            dilated = np.array(pil_mask) > 0
+            diff_vis[dilated] = [239, 68, 68]  # Đỏ nổi bật (Red highlight)
 
         diff_img = Image.fromarray(diff_vis)
         diff_map_b64 = image_to_base64(diff_img)
